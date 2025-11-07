@@ -107,7 +107,7 @@ fi
 # eza (enhanced ls - maintained fork of exa)
 if command -v eza &> /dev/null; then
     alias ls='eza'
-    alias ll='eza -alh --git'
+    alias ll='eza -alh'
     alias la='eza -a'
     alias l='eza -lh'
     alias tree='eza --tree'
