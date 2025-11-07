@@ -331,6 +331,49 @@ install_fzf() {
   log_info "fzf installed successfully"
 }
 
+# Install Node.js with asdf
+install_nodejs() {
+  local actual_user=$(get_actual_user)
+  local user_home=$(eval echo "~$actual_user")
+  local asdf_dir="$user_home/.asdf"
+  local nodejs_version="24.11.0"
+
+  # Check if asdf is installed
+  if [[ ! -d "$asdf_dir" ]]; then
+    log_error "asdf is not installed. Please install asdf first."
+    return 1
+  fi
+
+  log_info "Setting up Node.js with asdf..."
+
+  # Source asdf for this script
+  export ASDF_DIR="$asdf_dir"
+  export ASDF_DATA_DIR="$asdf_dir"
+  source "$asdf_dir/asdf.sh"
+
+  # Add nodejs plugin if not already added
+  if ! sudo -u "$actual_user" bash -c "source $asdf_dir/asdf.sh && asdf plugin list" | grep -q "nodejs"; then
+    log_info "Adding asdf nodejs plugin..."
+    sudo -u "$actual_user" bash -c "source $asdf_dir/asdf.sh && asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git"
+  else
+    log_info "asdf nodejs plugin already installed"
+  fi
+
+  # Check if Node.js version is already installed
+  if sudo -u "$actual_user" bash -c "source $asdf_dir/asdf.sh && asdf list nodejs 2>/dev/null" | grep -q "$nodejs_version"; then
+    log_info "Node.js $nodejs_version already installed"
+  else
+    log_info "Installing Node.js $nodejs_version (this may take a few minutes)..."
+    sudo -u "$actual_user" bash -c "source $asdf_dir/asdf.sh && asdf install nodejs $nodejs_version"
+  fi
+
+  # Set global Node.js version
+  log_info "Setting global Node.js version to $nodejs_version..."
+  sudo -u "$actual_user" bash -c "source $asdf_dir/asdf.sh && asdf global nodejs $nodejs_version"
+
+  log_info "Node.js $nodejs_version installed and set as global version"
+}
+
 # Setup configuration
 setup_config() {
   local actual_user=$(get_actual_user)
@@ -469,6 +512,7 @@ setup() {
   install_atuin
   install_uv
   install_asdf
+  install_nodejs
   install_fzf
   setup_config
   setup_git_aliases

@@ -52,10 +52,11 @@ sudo ./init.sh setup
    - asdf (v0.18.0)
    - fzf (v0.66.1)
 5. Runs curl-based installers for atuin and astral uv
-6. Sets up LazyVim configuration for neovim
-7. Copies `config/env` to `~/.config/myrpi/env`
-8. Modifies `~/.bashrc` to source the environment file
-9. Configures global git aliases for common operations
+6. Installs Node.js v24.11.0 via asdf and sets it as the global version
+7. Sets up LazyVim configuration for neovim
+8. Copies `config/env` to `~/.config/myrpi/env`
+9. Modifies `~/.bashrc` to source the environment file
+10. Configures global git aliases for common operations
 
 ### Script Features
 
