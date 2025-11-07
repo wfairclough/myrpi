@@ -262,6 +262,7 @@ install_bat() {
 # Install atuin
 install_atuin() {
   local actual_user=$(get_actual_user)
+  local user_home=$(eval echo "~$actual_user")
 
   if check_command "atuin"; then
     log_info "atuin is already installed, skipping"
@@ -270,11 +271,16 @@ install_atuin() {
 
   log_info "Installing atuin..."
   sudo -u "$actual_user" bash -c 'bash <(curl --proto "=https" --tlsv1.2 -sSf https://setup.atuin.sh)'
+
+  # Add cargo bin to PATH for this script (atuin installs to ~/.cargo/bin)
+  export PATH="$user_home/.cargo/bin:$PATH"
+  log_info "Added atuin to PATH for current session"
 }
 
 # Install uv
 install_uv() {
   local actual_user=$(get_actual_user)
+  local user_home=$(eval echo "~$actual_user")
 
   if check_command "uv"; then
     log_info "uv is already installed, skipping"
@@ -283,6 +289,10 @@ install_uv() {
 
   log_info "Installing astral uv..."
   sudo -u "$actual_user" bash -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
+
+  # Add uv to PATH for this script
+  export PATH="$user_home/.local/bin:$PATH"
+  log_info "Added uv to PATH for current session"
 }
 
 # Install Python with uv
@@ -290,6 +300,9 @@ install_python() {
   local actual_user=$(get_actual_user)
   local user_home=$(eval echo "~$actual_user")
   local python_version="3.14"
+
+  # Ensure uv is in PATH
+  export PATH="$user_home/.local/bin:$PATH"
 
   # Check if uv is installed
   if ! check_command "uv"; then
@@ -520,6 +533,14 @@ EOF
 setup() {
   show_welcome_banner
   log_info "Starting Raspberry Pi setup..."
+
+  # Get user info for PATH updates
+  local actual_user=$(get_actual_user)
+  local user_home=$(eval echo "~$actual_user")
+
+  # Update PATH to include all installation directories
+  export PATH="/usr/local/bin:$user_home/.local/bin:$user_home/.cargo/bin:$PATH"
+  log_info "Updated PATH for installation session"
 
   # Create temp directory
   mkdir -p "$TEMP_DIR"

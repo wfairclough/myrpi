@@ -65,6 +65,7 @@ sudo ./init.sh setup
 - **SHA256 verification**: Verifies checksums for downloaded binaries
 - **User preservation**: Runs installations as the actual user (not root) when appropriate
 - **Config file management**: Compares SHA256 checksums of config files and automatically updates if changed
+- **Dynamic PATH management**: Updates PATH during script execution so newly installed tools are immediately available for subsequent steps
 
 ## Extending the Setup Script
 
@@ -85,6 +86,11 @@ The script is designed for easy extension. To add a new tool:
    ```
 
 4. **For custom installs**: Create a new `install_toolname()` function and call it in `setup()`
+   - If the tool installs to a non-standard location (e.g., `~/.local/bin`), update PATH in the function:
+     ```bash
+     export PATH="$user_home/.local/bin:$PATH"
+     ```
+   - This ensures the tool is available immediately for subsequent installation steps
 
 ### Environment Configuration
 
